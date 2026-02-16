@@ -7,6 +7,8 @@ $pageTitle = $pageTitle ?? 'APK GNBRC';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="APK GNBRC - Système de gestion d'urgence">
+  <meta name="theme-color" content="#0052CC">
   <title><?= htmlspecialchars($pageTitle) ?></title>
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
