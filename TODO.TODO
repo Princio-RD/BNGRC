@@ -3,24 +3,24 @@
 ==========================================
 
 1. PREPARATION BASE DE DONNEES
-    - [ ] Mettre à jour le script SQL (sql/BNGRC.sql)
+    - [x] Mettre à jour le script SQL (sql/BNGRC.sql)
         - Table besoin_achats
             - id, besoin_id, don_id, montant_achat, frais_pourcent, montant_frais, montant_total, ville_id, date_achat
         - Index utiles (besoin_id, ville_id, don_id)
         - Clés étrangères (villes, besoins, dons)
-    - [ ] Ajouter colonne ou table de suivi si nécessaire (ex: historique achats)
+    - [x] Ajouter colonne ou table de suivi si nécessaire (ex: historique achats)
 
 2. MODELES
-    - [ ] Créer BesoinAchatModel.php
+    - [x] Créer BesoinAchatModel.php
         - Méthode getAll() - récupérer tous les achats
         - Méthode getByVille($ville_id) - filtrer par ville
         - Méthode create($data) - créer un achat
         - Méthode calculateTotal($montant, $frais_pourcent) - calcul frais
         - Méthode verifyDoublon($besoin_id, $ville_id) - vérifier achat existant
-    - [ ] Modifier DonModel.php
+    - [x] Modifier DonModel.php
         - Ajouter méthode getRemainingAmount($ville_id = null) - montant dons restants
         - Ajouter méthode verifyAvailableAmount($montant, $ville_id = null) - vérifier suffisance
-    - [ ] Modifier BesoinModel.php
+    - [x] Modifier BesoinModel.php
         - Méthode getRemainingNeedsByVille($ville_id = null)
         - Méthode getTotalNeedsSummary()
     - [ ] Modifier DistributionModel.php (si utilisé pour l’affectation finale)
