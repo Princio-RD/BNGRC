@@ -10,10 +10,28 @@ use app\models\VilleModel;
 
 class BesoinAchatController
 {
+    private static function isAjaxRequest(): bool
+    {
+        $requestedWith = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '';
+        if (strtolower($requestedWith) === 'xmlhttprequest') {
+            return true;
+        }
+
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return stripos($accept, 'application/json') !== false;
+    }
+
     public static function index()
     {
         $achats = BesoinAchatModel::getAll();
         $villes = VilleModel::getAll();
+
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'achats' => $achats,
+            ]);
+            return;
+        }
 
         Flight::render('besoin_achats', [
             'achats' => $achats,
@@ -26,6 +44,13 @@ class BesoinAchatController
     {
         $achats = BesoinAchatModel::getByVille($id);
         $villes = VilleModel::getAll();
+
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'achats' => $achats,
+            ]);
+            return;
+        }
 
         Flight::render('besoin_achats', [
             'achats' => $achats,
@@ -118,6 +143,23 @@ class BesoinAchatController
             'dons_restants' => DonModel::getRemainingAmount(),
         ];
 
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'errors' => $errors,
+                'result' => [
+                    'id_besoin' => $idBesoin,
+                    'montant_achat' => $montantAchat,
+                    'frais_pourcent' => $fraisPourcent,
+                    'montant_frais' => $montantFrais,
+                    'montant_total' => $montantTotal,
+                    'besoin' => $besoin !== false ? $besoin : null,
+                    'montant_restant_besoin' => $montantRestantBesoin,
+                    'dons_restants' => DonModel::getRemainingAmount(),
+                ],
+            ]);
+            return;
+        }
+
         Flight::render('simulation', [
             'besoins' => $besoins,
             'villes' => $villes,
@@ -181,6 +223,23 @@ class BesoinAchatController
         }
 
         if (!empty($errors)) {
+            if (self::isAjaxRequest()) {
+                Flight::json([
+                    'errors' => $errors,
+                    'result' => [
+                        'id_besoin' => $idBesoin,
+                        'montant_achat' => $montantAchat,
+                        'frais_pourcent' => $fraisPourcent,
+                        'montant_frais' => $montantFrais,
+                        'montant_total' => $montantTotal,
+                        'besoin' => $besoin !== false ? $besoin : null,
+                        'montant_restant_besoin' => $montantRestantBesoin,
+                        'dons_restants' => DonModel::getRemainingAmount(),
+                    ],
+                ]);
+                return;
+            }
+
             Flight::render('simulation', [
                 'besoins' => $besoins,
                 'villes' => $villes,
@@ -219,6 +278,15 @@ class BesoinAchatController
         } catch (\Throwable $e) {
             $db->rollBack();
             $errors[] = 'Erreur lors de la validation de l\'achat.';
+        }
+
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'errors' => $errors,
+                'result' => null,
+                'success' => empty($errors) ? 'Achat validé avec succès.' : null,
+            ]);
+            return;
         }
 
         $besoins = BesoinModel::getRemainingNeedsByVille($villeId);

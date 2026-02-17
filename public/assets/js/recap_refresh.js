@@ -1,6 +1,4 @@
 // JS pour l'AJAX de rafraîchissement sur la page récapitulation
-const refreshBtn = document.getElementById('btn-refresh');
-const statusEl = document.getElementById('refresh-status');
 
 const fmt = (value) => {
     const num = Number(value) || 0;
@@ -51,22 +49,20 @@ const updateStats = (data) => {
     document.getElementById('dons-restants').textContent = fmt(data.dons_restants);
 };
 
+const refreshBtn = document.getElementById('btn-refresh');
+const statusEl = document.getElementById('refresh-status');
+
 if (refreshBtn) {
-    refreshBtn.addEventListener('click', async () => {
-        statusEl.textContent = 'Actualisation...';
-        try {
-            const response = await fetch('/recap/actualiser', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-            const data = await response.json();
-            updateStats(data);
-            updateTable(data.details);
-            statusEl.textContent = 'Mis à jour.';
-        } catch (e) {
-            statusEl.textContent = 'Erreur de mise à jour.';
-        }
+    refreshBtn.addEventListener('click', () => {
+        Ajax.post('/recap/actualiser', null, {
+            statusElement: statusEl,
+            onSuccess: (data) => {
+                updateStats(data);
+                updateTable(data.details);
+            },
+            onError: (error) => {
+                console.error('Erreur lors de l\'actualisation:', error);
+            }
+        });
     });
 }
