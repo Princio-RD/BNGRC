@@ -10,18 +10,9 @@
 
 <?php include __DIR__ . '/partials/header.php'; ?>
 
+<?php include __DIR__ . '/partials/nav.php'; ?>
+
 <div class="content">
-    <aside class="panel-gauche">
-        <ul class="menu">
-            <li class="menu-item"><a href="/">Tableau de bord</a></li>
-            <li class="menu-item"><a href="/besoin">Besoin</a></li>
-            <li class="menu-item"><a href="/dons">Dons disponible</a></li>
-            <li class="menu-item"><a href="/ville">Ville</a></li>
-            <li class="menu-item"><a href="/achats">Achats</a></li>
-            <li class="menu-item"><a href="/simulation">Simulation</a></li>
-            <li class="menu-item active"><a href="/recap">Récapitulation</a></li>
-        </ul>
-    </aside>
     <main class="panel-center">
         <h2>Récapitulation des Besoins (Montants)</h2>
 

@@ -36,20 +36,8 @@ body {
 }
 
 /* ================= SIDEBAR ================= */
-.panel-gauche {
-  width: 260px;
-  background: var(--bg-surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
-  height: calc(100vh - 40px);
-  position: sticky;
-  top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.menu { list-style: none; margin-top: 20px; }
+/* La barre latérale a été remplacée par la navigation principale */
+.menu { list-style: none; }
 .menu-item { margin-bottom: 8px; }
 
 .menu-item a {
@@ -100,6 +88,37 @@ body {
   color: #e74c3c; /* Couleur rouge pour "Mode Urgent" */
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* ================= NAVIGATION ================= */
+.main-navigation {
+  background-color: #34495e; /* Un peu plus clair que le header */
+  box-shadow: var(--shadow-sm);
+}
+
+.main-navigation .menu {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: flex-start; /* Aligner à gauche */
+  overflow-x: auto; /* Permet le scroll horizontal sur petits écrans */
+}
+
+.main-navigation .menu-item {
+  margin: 0;
+}
+
+.main-navigation .menu-item a {
+  color: #ecf0f1;
+  padding: 14px 20px;
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.main-navigation .menu-item a:hover, .main-navigation .menu-item.active a {
+  background-color: #e74c3c; /* Couleur d'accentuation du header */
+  color: white;
 }
 
 /* ================= MAIN CONTENT ================= */
