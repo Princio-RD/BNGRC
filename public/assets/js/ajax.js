@@ -95,6 +95,9 @@ const Ajax = {
 
             xhr.open(upperMethod, finalUrl, true);
 
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'application/json');
+
             if (!(payload instanceof FormData) && contentType) {
                 xhr.setRequestHeader('Content-Type', contentType);
             }

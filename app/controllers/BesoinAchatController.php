@@ -26,6 +26,13 @@ class BesoinAchatController
         $achats = BesoinAchatModel::getAll();
         $villes = VilleModel::getAll();
 
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'achats' => $achats,
+            ]);
+            return;
+        }
+
         Flight::render('besoin_achats', [
             'achats' => $achats,
             'villes' => $villes,
@@ -37,6 +44,13 @@ class BesoinAchatController
     {
         $achats = BesoinAchatModel::getByVille($id);
         $villes = VilleModel::getAll();
+
+        if (self::isAjaxRequest()) {
+            Flight::json([
+                'achats' => $achats,
+            ]);
+            return;
+        }
 
         Flight::render('besoin_achats', [
             'achats' => $achats,

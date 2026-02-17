@@ -18,6 +18,7 @@ include __DIR__ . '/partials/header.php';
                 <?php endforeach; ?>
             </select>
             <a href="/besoin/simulation" class="btn btn-edit">Nouvelle simulation</a>
+            <span id="achats-status" class="hint"></span>
         </div>
     </div>
 
