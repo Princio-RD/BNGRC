@@ -44,9 +44,6 @@
                         <label style="display: block; cursor: pointer;">
                             <input type="radio" name="type_simulation" value="quantite"> Par Quantité (Plus petite demande en premier)
                         </label>
-                        <label style="display: block; cursor: pointer;">
-                            <input type="radio" name="type_simulation" value="urgence"> Par repartiton (Villes les plus sinistrées)
-                        </label>
                     </div>
                     <button type="submit" class="btn btn-primary">Lancer la Simulation</button>
                 </form>

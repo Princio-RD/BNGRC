@@ -37,20 +37,15 @@ class AchatModel {
     }
 
     public static function getRemainingNeeds($id_ville = null, $order_by = 'date') {
-        $sql = "SELECT vbr.*, v.nombre_sinistres 
-                FROM v_besoins_restants vbr
-                JOIN ville v ON vbr.id_ville = v.id_ville
-                WHERE vbr.quantite_restante > 0";
+        $sql = "SELECT * FROM v_besoins_restants WHERE quantite_restante > 0";
         if ($id_ville) {
-            $sql .= " AND vbr.id_ville = :id_ville";
+            $sql .= " AND id_ville = :id_ville";
         }
         
         if ($order_by === 'quantite') {
-            $sql .= " ORDER BY vbr.quantite_restante ASC"; 
-        } else if ($order_by === 'urgence') {
-            $sql .= " ORDER BY v.nombre_sinistres DESC, vbr.date_besoin ASC"; 
+            $sql .= " ORDER BY quantite_restante ASC"; // Priorité aux petites demandes
         } else {
-            $sql .= " ORDER BY vbr.date_besoin ASC"; 
+            $sql .= " ORDER BY date_besoin ASC"; // Priorité FIFO (par défaut)
         }
 
         $stmt = Flight::db()->prepare($sql);

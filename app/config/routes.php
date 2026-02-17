@@ -78,4 +78,6 @@ Flight::route('POST /simulation/reset', [HomeController::class, 'resetData']);
 Flight::route('GET /recap', [HomeController::class, 'recapPage']);
 Flight::route('GET /recap/data', [HomeController::class, 'recapData']);
 
-// Ne pas mettre Flight::start() ici car il est déjà appelé dans bootstrap.php
+
+// L'application est démarrée depuis bootstrap.php via $app->start();
+// Ne pas appeler Flight::start() ici pour éviter le traitement double des routes

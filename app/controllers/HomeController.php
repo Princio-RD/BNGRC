@@ -247,7 +247,7 @@ class HomeController
         $simulation_summary = $_SESSION['simulation_summary'] ?? null;
         $flash_message = $_SESSION['flash_message'] ?? null;
 
-        
+        // On nettoie la session pour ne pas afficher les données plusieurs fois
         unset($_SESSION['simulation_plan'], $_SESSION['simulation_summary'], $_SESSION['flash_message']);
 
         Flight::render('simulation', [
@@ -257,39 +257,6 @@ class HomeController
         ]);
     }
 
-    private static function distribuer_proportionnellement(int $total_a_distribuer, array $besoins): array
-    {
-        $total_besoins = array_sum($besoins);
-        if ($total_besoins == 0) {
-            return array_fill_keys(array_keys($besoins), 0);
-        }
-
-        $allocations = [];
-        $restes = [];
-
-       
-        foreach ($besoins as $id => $quantite_besoin) {
-            $part_ideale = ($quantite_besoin / $total_besoins) * $total_a_distribuer;
-            $allocations[$id] = floor($part_ideale);
-            $restes[$id] = $part_ideale - $allocations[$id];
-        }
-
-        // 2. Calculer le reste à distribuer après l'allocation de base
-        $total_alloue = array_sum($allocations);
-        $reste_a_distribuer = $total_a_distribuer - $total_alloue;
-
-        // 3. Trier les besoins par la partie fractionnaire (reste) en ordre décroissant
-        arsort($restes);
-
-        // 4. Distribuer le reste (1 par 1) aux besoins ayant les plus grands restes
-        foreach (array_keys($restes) as $id) {
-            if ($reste_a_distribuer-- > 0) {
-                $allocations[$id]++;
-            }
-        }
-        return $allocations;
-    }
-
     public static function runSimulation()
     {
         if (session_status() == PHP_SESSION_NONE) {
@@ -297,71 +264,67 @@ class HomeController
         }
         
         $type_simulation = Flight::request()->data->type_simulation ?? 'date';
-        $besoins = AchatModel::getRemainingNeeds(null, $type_simulation); // L'ordre reste important pour la phase d'achat
+        $besoins = AchatModel::getRemainingNeeds(null, $type_simulation);
         
-        $dons_disponibles = AchatModel::getAvailableInKindDonations(); // Triés par date (FIFO)
+        $dons_disponibles = AchatModel::getAvailableInKindDonations();
         $solde_argent = AchatModel::getCashBalance();
         $frais_pourcentage = AchatModel::getPurchaseFee();
 
         $plan = [];
         $cout_total_achats = 0;
 
-        // Map pour suivre les quantités restantes pour chaque besoin
-        $besoins_restants_map = [];
-        foreach ($besoins as $besoin) {
-            $besoins_restants_map[$besoin['id_besoin']] = [
-                'quantite_restante' => (int)$besoin['quantite_restante'],
-                'details' => $besoin // garder toutes les infos
-            ];
-        }
-
-        // --- 1. Phase de Distribution Proportionnelle des Dons en Nature ---
+        // Copie modifiable des dons, indexée par produit pour un accès rapide
+        $stock_par_produit = [];
         foreach ($dons_disponibles as $don) {
-            $id_produit_don = $don['id_produit'];
-            $quantite_don = (int)$don['quantite_restante'];
-            if ($quantite_don <= 0) continue;
-
-            // Trouver tous les besoins actuels pour ce produit
-            $besoins_pour_produit = [];
-            foreach ($besoins_restants_map as $id_besoin => $data) {
-                if ($data['details']['id_produit'] == $id_produit_don && $data['quantite_restante'] > 0) {
-                    $besoins_pour_produit[$id_besoin] = $data['quantite_restante'];
-                }
+            if (!isset($stock_par_produit[$don['id_produit']])) {
+                $stock_par_produit[$don['id_produit']] = [];
             }
-
-            if (empty($besoins_pour_produit)) continue;
-
-            // Distribuer le don actuel proportionnellement
-            $allocations = self::distribuer_proportionnellement($quantite_don, $besoins_pour_produit);
-
-            // Ajouter les actions au plan et mettre à jour les besoins restants
-            foreach ($allocations as $id_besoin => $quantite_allouee) {
-                if ($quantite_allouee > 0) {
-                    $besoin_details = $besoins_restants_map[$id_besoin]['details'];
-                    $plan[] = [
-                        'type' => 'distribution',
-                        'id_besoin' => $id_besoin,
-                        'id_don' => $don['id_don'],
-                        'quantite' => $quantite_allouee,
-                        'ville' => $besoin_details['nom_ville'],
-                        'produit' => $besoin_details['nom_produit'],
-                        'source' => 'Don #' . $don['id_don']
-                    ];
-                    $besoins_restants_map[$id_besoin]['quantite_restante'] -= $quantite_allouee;
-                }
-            }
+            $stock_par_produit[$don['id_produit']][] = $don;
         }
 
-        // --- 2. Phase d'Achat pour les Besoins Restants ---
         foreach ($besoins as $besoin) {
-            $id_besoin = $besoin['id_besoin'];
-            $quantite_restante_besoin = $besoins_restants_map[$id_besoin]['quantite_restante'];
+            $quantite_restante_besoin = (int)$besoin['quantite_restante'];
+            if ($quantite_restante_besoin <= 0) continue;
 
+            // 1. Utiliser les dons en nature en priorité
+            if (isset($stock_par_produit[$besoin['id_produit']])) {
+                foreach ($stock_par_produit[$besoin['id_produit']] as &$don_en_stock) { // Référence pour modifier
+                    if ($quantite_restante_besoin == 0) break;
+
+                    $a_distribuer = min($quantite_restante_besoin, $don_en_stock['quantite_restante']);
+                    if ($a_distribuer > 0) {
+                        $plan[] = [
+                            'type' => 'distribution',
+                            'id_besoin' => $besoin['id_besoin'],
+                            'id_don' => $don_en_stock['id_don'],
+                            'quantite' => $a_distribuer,
+                            'ville' => $besoin['nom_ville'],
+                            'produit' => $besoin['nom_produit'],
+                            'source' => 'Don #' . $don_en_stock['id_don']
+                        ];
+                        $don_en_stock['quantite_restante'] -= $a_distribuer;
+                        $quantite_restante_besoin -= $a_distribuer;
+                    }
+                }
+                unset($don_en_stock); // Casser la référence
+            }
+
+            // 2. Si le besoin n'est pas comblé, essayer d'acheter avec l'argent disponible
             if ($quantite_restante_besoin > 0) {
                 $cout_achat = $quantite_restante_besoin * (float)$besoin['prix_unitaire'] * (1 + $frais_pourcentage / 100);
                 
                 if (($solde_argent - $cout_total_achats) >= $cout_achat) {
-                    $plan[] = [ 'type' => 'achat', 'id_besoin' => $id_besoin, 'quantite' => $quantite_restante_besoin, 'cout_unitaire' => (float)$besoin['prix_unitaire'], 'frais' => $frais_pourcentage, 'cout_total' => $cout_achat, 'ville' => $besoin['nom_ville'], 'produit' => $besoin['nom_produit'], 'source' => 'Argent' ];
+                     $plan[] = [
+                        'type' => 'achat',
+                        'id_besoin' => $besoin['id_besoin'],
+                        'quantite' => $quantite_restante_besoin,
+                        'cout_unitaire' => (float)$besoin['prix_unitaire'],
+                        'frais' => $frais_pourcentage,
+                        'cout_total' => $cout_achat,
+                        'ville' => $besoin['nom_ville'],
+                        'produit' => $besoin['nom_produit'],
+                        'source' => 'Argent'
+                    ];
                     $cout_total_achats += $cout_achat;
                 }
             }
