@@ -46,11 +46,11 @@ class AchatModel {
         }
         
         if ($order_by === 'quantite') {
-            $sql .= " ORDER BY vbr.quantite_restante ASC"; // Priorité aux petites demandes
+            $sql .= " ORDER BY vbr.quantite_restante ASC"; 
         } else if ($order_by === 'urgence') {
-            $sql .= " ORDER BY v.nombre_sinistres DESC, vbr.date_besoin ASC"; // Priorité aux villes avec le plus de sinistrés
+            $sql .= " ORDER BY v.nombre_sinistres DESC, vbr.date_besoin ASC"; 
         } else {
-            $sql .= " ORDER BY vbr.date_besoin ASC"; // Priorité FIFO (par défaut)
+            $sql .= " ORDER BY vbr.date_besoin ASC"; 
         }
 
         $stmt = Flight::db()->prepare($sql);
