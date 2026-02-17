@@ -35,6 +35,9 @@
                         <label style="display: block; cursor: pointer;">
                             <input type="radio" name="type_simulation" value="quantite"> Par Quantité (Plus petite demande en premier)
                         </label>
+                        <label style="display: block; cursor: pointer;">
+                            <input type="radio" name="type_simulation" value="proportionnel"> Proportionnel (Répartition équitable des stocks)
+                        </label>
                     </div>
                     <button type="submit" class="btn btn-primary">Lancer la Simulation</button>
                 </form>

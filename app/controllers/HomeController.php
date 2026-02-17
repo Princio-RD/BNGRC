@@ -275,23 +275,55 @@ class HomeController
 
         // Copie modifiable des dons, indexée par produit pour un accès rapide
         $stock_par_produit = [];
+        $total_stock_initial = []; // Pour le calcul proportionnel
+
         foreach ($dons_disponibles as $don) {
             if (!isset($stock_par_produit[$don['id_produit']])) {
                 $stock_par_produit[$don['id_produit']] = [];
+                $total_stock_initial[$don['id_produit']] = 0;
             }
             $stock_par_produit[$don['id_produit']][] = $don;
+            $total_stock_initial[$don['id_produit']] += $don['quantite_restante'];
+        }
+
+        // Calcul des besoins totaux par produit pour la proportion
+        $total_besoin_initial = [];
+        if ($type_simulation === 'proportionnel') {
+            foreach ($besoins as $b) {
+                $pid = $b['id_produit'];
+                $total_besoin_initial[$pid] = ($total_besoin_initial[$pid] ?? 0) + $b['quantite_restante'];
+            }
         }
 
         foreach ($besoins as $besoin) {
             $quantite_restante_besoin = (int)$besoin['quantite_restante'];
             if ($quantite_restante_besoin <= 0) continue;
 
+            // Déterminer la limite autorisée sur le stock (par défaut : tout le besoin)
+            $limite_stock = $quantite_restante_besoin;
+
+            if ($type_simulation === 'proportionnel') {
+                $pid = $besoin['id_produit'];
+                $t_stock = $total_stock_initial[$pid] ?? 0;
+                $t_need = $total_besoin_initial[$pid] ?? 0;
+                
+                if ($t_need > 0 && $t_stock < $t_need) {
+                    // Calcul proportionnel avec arrondissement vers le bas (floor)
+                    $ratio = $t_stock / $t_need;
+                    $limite_stock = floor($quantite_restante_besoin * $ratio);
+                }
+            }
+
             // 1. Utiliser les dons en nature en priorité
             if (isset($stock_par_produit[$besoin['id_produit']])) {
+                $pris_sur_stock = 0; // Quantité déjà prise sur le stock pour ce besoin
                 foreach ($stock_par_produit[$besoin['id_produit']] as &$don_en_stock) { // Référence pour modifier
                     if ($quantite_restante_besoin == 0) break;
+                    if ($pris_sur_stock >= $limite_stock) break; // Stop si on atteint la limite proportionnelle
 
-                    $a_distribuer = min($quantite_restante_besoin, $don_en_stock['quantite_restante']);
+                    $reste_a_prendre = $limite_stock - $pris_sur_stock;
+                    $a_distribuer = min($quantite_restante_besoin, $don_en_stock['quantite_restante'], $reste_a_prendre);
+                    
                     if ($a_distribuer > 0) {
                         $plan[] = [
                             'type' => 'distribution',
@@ -304,6 +336,7 @@ class HomeController
                         ];
                         $don_en_stock['quantite_restante'] -= $a_distribuer;
                         $quantite_restante_besoin -= $a_distribuer;
+                        $pris_sur_stock += $a_distribuer;
                     }
                 }
                 unset($don_en_stock); // Casser la référence
