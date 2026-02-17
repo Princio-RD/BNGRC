@@ -11,28 +11,8 @@
 
 <?php include __DIR__ . '/partials/header.php'; ?>
 
-<div class="content">
-  <aside class="panel-gauche">
-    <ul class="menu">
-      <!-- <li class="menu-item"><a href="<?php echo Flight::get('flight.base_url'); ?>/">Tableau de bord</a></li>
-      <li class="menu-item"><a href="<?php echo Flight::get('flight.base_url'); ?>/besoin">Besoin</a></li>
-      <li class="menu-item"><a href="<?php echo Flight::get('flight.base_url'); ?>/dons">Dons disponible</a></li>
-      <li class="menu-item"><a href="<?php echo Flight::get('flight.base_url'); ?>/ville">Ville</a></li> -->
-
-      <li class="menu-item"><a href="/"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
-        <li class="menu-item"><a href="/besoin"><i class="fa-solid fa-hand-holding-heart"></i> Besoin</a></li>
-        <li class="menu-item"><a href="/dons"><i class="fa-solid fa-box-open"></i> Dons disponible</a></li>
-        <li class="menu-item"><a href="/ville"><i class="fa-solid fa-city"></i> Ville</a></li>
-        <li class="menu-item"><a href="/achats"><i class="fa-solid fa-cart-shopping"></i> Achats</a></li>
-        <li class="menu-item"><a href="/simulation"><i class="fa-solid fa-calculator"></i> Simulation</a></li>
-        <li class="menu-item"><a href="/recap"><i class="fa-solid fa-file-invoice-dollar"></i> Récapitulation</a></li>
-
-    </ul>
-  </aside>
-  <main class="panel-center">
     <h2>Liste des Besoins</h2>
 
-  
     <div class="form-card">
       <h3>Ajouter un besoin</h3>
       <form method="POST" action="/besoin" class="form-inline">
@@ -53,7 +33,6 @@
         <button type="submit" class="btn btn-add">Ajouter</button>
       </form>
     </div>
-
 
     <table class="table">
       <thead>
@@ -91,14 +70,9 @@
             </tr>
           <?php endforeach; ?>
         <?php else: ?>
-          <tr><td colspan="10">Aucun besoin en cours.</td></tr>
+          <tr><td colspan="11">Aucun besoin en cours.</td></tr>
         <?php endif; ?>
       </tbody>
     </table>
-  </main>
-</div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
-
-</body>
-</html>
