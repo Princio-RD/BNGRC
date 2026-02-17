@@ -76,13 +76,6 @@ return [
 		// 'file_path' => __DIR__ . $ds . '..' . $ds . 'database.sqlite', // Path to SQLite file
 	],
 
-	/**************************************
-	 *       Achats (frais) Settings      *
-	 **************************************/
-	'achats' => [
-		'frais_pourcent' => 10,
-	],
-
 	// Google OAuth Credentials
 	// 'google_oauth' => [
 	//     'client_id'     => 'your_client_id',     // Google API client ID

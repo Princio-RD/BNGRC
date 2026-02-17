@@ -7,9 +7,7 @@ use PDO;
 
 class DistributionModel
 {
-    /**
-     * Récupérer toutes les distributions avec détails
-     */
+   
     public static function getAll(): array
     {
         $stmt = Flight::db()->query(
@@ -30,5 +28,16 @@ class DistributionModel
              ORDER BY dist.date_distribution DESC'
         );
         return $stmt->fetchAll();
+    }
+
+    public static function insert(int $id_besoin, int $id_don, string $date_distribution, int $quantite): bool
+    {
+        $sql = "INSERT INTO distribution (id_besoin, id_don, date_distribution, quantite_distribution) VALUES (:id_besoin, :id_don, :date_distribution, :quantite_distribution)";
+        $stmt = Flight::db()->prepare($sql);
+        $stmt->bindValue(':id_besoin', $id_besoin, PDO::PARAM_INT);
+        $stmt->bindValue(':id_don', $id_don, PDO::PARAM_INT);
+        $stmt->bindValue(':date_distribution', $date_distribution);
+        $stmt->bindValue(':quantite_distribution', $quantite, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }

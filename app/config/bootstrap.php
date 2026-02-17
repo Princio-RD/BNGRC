@@ -7,8 +7,8 @@
  */
 $ds = DIRECTORY_SEPARATOR;
 require(__DIR__ . $ds . '..' . $ds . '..' . $ds . 'vendor' . $ds . 'autoload.php');
-if (file_exists(__DIR__ . $ds . 'config.php') === false) {
-    Flight::halt(500, 'Config file not found. Please create a config.php file in the app/config directory to get started.');
+if(file_exists(__DIR__. $ds . 'config.php') === false) {
+	Flight::halt(500, 'Config file not found. Please create a config.php file in the app/config directory to get started.');
 }
 
 // It is better practice to not use static methods for everything. It makes your
@@ -27,11 +27,14 @@ if (session_status() === PHP_SESSION_NONE) {
  * will be returned by the require statement where you can assign it to a var.
  */
 $config = require('config.php');
-$app->set('app.config', $config);
+
+// Dynamically set the base URL
+$base_path = str_replace('/public', '', dirname($_SERVER['SCRIPT_NAME']));
+define('BASE_URL', rtrim($base_path, '/') . '/');
 
 
 // Helper pour échapper les chaînes dans les vues
-Flight::map('e', function ($string) {
+Flight::map('e', function($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 });
 
@@ -51,7 +54,7 @@ Flight::map('e', function ($string) {
  * service, or if you should create a new instance of the service every time you need it.
  * That's a discussion for another day. Suffice to say, that Flight has a basic concept
  * of a services container by registering classes to the Engine class.
- */
+ */ 
 require('services.php');
 
 // Whip out the ol' router and we'll pass that to the routes file
