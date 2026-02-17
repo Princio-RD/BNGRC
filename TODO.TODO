@@ -1,0 +1,98 @@
+==========================================
+    NOUVELLES FONCTIONNALITES - TODO
+==========================================
+
+1. PREPARATION BASE DE DONNEES
+    - [x] Mettre à jour le script SQL (sql/BNGRC.sql)
+        - Table besoin_achats
+            - id, besoin_id, don_id, montant_achat, frais_pourcent, montant_frais, montant_total, ville_id, date_achat
+        - Index utiles (besoin_id, ville_id, don_id)
+        - Clés étrangères (villes, besoins, dons)
+    - [x] Ajouter colonne ou table de suivi si nécessaire (ex: historique achats)
+
+2. MODELES
+    - [x] Créer BesoinAchatModel.php
+        - Méthode getAll() - récupérer tous les achats
+        - Méthode getByVille($ville_id) - filtrer par ville
+        - Méthode create($data) - créer un achat
+        - Méthode calculateTotal($montant, $frais_pourcent) - calcul frais
+        - Méthode verifyDoublon($besoin_id, $ville_id) - vérifier achat existant
+    - [x] Modifier DonModel.php
+        - Ajouter méthode getRemainingAmount($ville_id = null) - montant dons restants
+        - Ajouter méthode verifyAvailableAmount($montant, $ville_id = null) - vérifier suffisance
+    - [x] Modifier BesoinModel.php
+        - Méthode getRemainingNeedsByVille($ville_id = null)
+        - Méthode getTotalNeedsSummary()
+    - [ ] Modifier DistributionModel.php (si utilisé pour l’affectation finale)
+
+3. CONTROLLERS
+    - [ ] Créer BesoinAchatController.php
+        - index() - afficher liste achats
+        - listByVille() - filtrer par ville
+        - simulation() - POST calcul simulation
+        - validateSimulation() - POST confirmer achat (avec transaction)
+    - [ ] Créer RecapitulationController.php
+        - show() - afficher page récapitulation
+        - refresh() - API AJAX mise à jour (JSON)
+    - [ ] Mettre à jour HomeController.php si navigation/menu nécessaire
+
+4. ROUTES (app/config/routes.php)
+    - [ ] Route GET /besoin/achats - liste achats
+    - [ ] Route GET /besoin/achats/ville/@id - filtrer par ville
+    - [ ] Route POST /besoin/simulation - calculer simulation
+    - [ ] Route POST /besoin/simulation/valider - confirmer achat
+    - [ ] Route GET /recap - page récapitulation
+    - [ ] Route POST /recap/actualiser - AJAX refresh données
+
+5. VUES - PAGE ACHATS
+    - [ ] Créer besoin_achats.php
+        - Tableau des achats (besoin, montant, frais, total, ville)
+        - Dropdown filtre par ville
+        - Bouton rafraîchir
+        - Lien vers simulation
+
+6. VUES - PAGE SIMULATION
+    - [ ] Créer simulation.php
+        - Formulaire sélection besoin + montant
+        - Affichage calcul temps réel (AJAX ou submit classique)
+        - Affichage frais appliqués
+        - Message erreur si dons insuffisants
+        - Message erreur si achat existe déjà
+        - Bouton "Simuler" + "Valider"
+
+7. VUES - PAGE RECAPITULATION
+    - [ ] Créer recap.php
+        - Total besoins satisfaits (montant)
+        - Total besoins restants (montant)
+        - Montant dons utilisés vs dons totaux
+        - Tableau détail besoins (satisfait/restant)
+        - Bouton "Actualiser" (AJAX)
+        - Mise à jour dynamique sans rechargement
+
+8. LOGIQUE METIER
+    - [ ] Implémenter calcul frais: montant_total = montant + (montant * frais_pourcent / 100)
+    - [ ] Gérer validation: dons suffisants + pas de doublon
+    - [ ] Messages d'erreur clairs
+    - [ ] Gestion transactions BD
+    - [ ] Arrondis cohérents (ex: 2 décimales)
+    - [ ] Journalisation minimale (log achats)
+
+9. CONFIGURATION
+    - [ ] Ajouter paramètre frais_achat dans app/config/config.php (ex: 10)
+    - [ ] Charger la config via app/config/bootstrap.php
+    - [ ] Option admin (si prévue) pour modifier ce paramètre
+
+10. TESTS & VALIDATION
+    - [ ] Tester achat avec frais
+    - [ ] Tester filtrage par ville
+    - [ ] Tester AJAX rafraîchissement
+    - [ ] Tester gestion erreurs (dons insuffisants)
+    - [ ] Tester double achat (erreur)
+    - [ ] Tester calculs montants
+    - [ ] Tester transactions (rollback en cas d’erreur)
+    - [ ] Vérifier affichage sur [app/views](app/views)
+
+11. ASSETS & UI
+    - [ ] Mettre à jour style.css si besoin
+    - [ ] Ajouter JS pour AJAX (public/style ou app/views/partials)
+    - [ ] Vérifier navigation et liens entre pages
