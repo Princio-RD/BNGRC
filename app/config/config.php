@@ -46,7 +46,8 @@ if (empty($app) === true) {
 $app->path(__DIR__ . $ds . '..' . $ds . '..');
 
 // Core config variables
-$app->set('flight.base_url', '/',);           // Base URL for your app. Change if app is in a subdirectory (e.g., '/myapp/')
+// $app->set('flight.base_url', '/ETU004384/ETU004384_4239_3991/public/'); 
+$app->set('flight.base_url', '/');            // Base URL for your app. Change if app is in a subdirectory (e.g., '/myapp/')
 $app->set('flight.case_sensitive', false);    // Set true for case sensitive routes. Default: false
 $app->set('flight.log_errors', true);         // Log errors to file. Recommended: true in production
 $app->set('flight.handle_errors', false);     // Let Tracy handle errors if false. Set true to use Flight's error handler
@@ -65,31 +66,46 @@ return [
 	/**************************************
 	 *         Database Settings          *
 	 **************************************/
+	// 'database' => [
+	// 	// MySQL Example:
+	// 	'host'     => 'localhost:3306',      // Utiliser IP au lieu de 'localhost' pour forcer TCP (XAMPP socket)          // Database port
+	// 	'dbname'   => 'db_s2_ETU004384',   // Database name
+	// 	'user'     => 'ETU004384',  // Database user
+	// 	'password' => 'EHa5Cxir',  // Database password
+
+	// 	// SQLite Example:
+	// 	// 'file_path' => __DIR__ . $ds . '..' . $ds . 'database.sqlite', // Path to SQLite file
+	// ],
 	'database' => [
 		// MySQL Example:
-		'host'     => 'localhost',      // Utiliser IP au lieu de 'localhost' pour forcer TCP (XAMPP socket)
-		'port'     => '3306',            // Database port
-		'dbname'   => 'BNGRC',   // Database name
+		'host'     => 'localhost:3306',   
+		'port'  => '3306',      // Utiliser IP au lieu de 'localhost' pour forcer TCP (XAMPP socket)          // Database port
+		'dbname'   => 'BNGRC2',   // Database name
 		'user'     => 'root',  // Database user
 		'password' => '',  // Database password
+
 		// SQLite Example:
 		// 'file_path' => __DIR__ . $ds . '..' . $ds . 'database.sqlite', // Path to SQLite file
 	],
+	// 'database' => [
+	// 	// MySQL Example:
+	// 	'host'     => 'localhost:3306',      // Utiliser IP au lieu de 'localhost' pour forcer TCP (XAMPP socket)
+	// 	'port'     => '3306',            // Database port
+	// 	'dbname'   => 'db_s2_ETU004384',   // Database name
+	// 	'user'     => 'ETU004384',  // Database user
+	// 	'password' => 'EHa5Cxir',  // Database password
 
-	/**************************************
-	 *       Achats (frais) Settings      *
-	 **************************************/
-	'achats' => [
-		'frais_pourcent' => 10,
-	],
+	// 	// SQLite Example:
+	// 	// 'file_path' => __DIR__ . $ds . '..' . $ds . 'database.sqlite', // Path to SQLite file
+	// ],
 
-	// 	// Google OAuth Credentials
-	// 	// 'google_oauth' => [
-	// 	//     'client_id'     => 'your_client_id',     // Google API client ID
-	// 	//     'client_secret' => 'your_client_secret', // Google API client secret
-	// 	//     'redirect_uri'  => 'your_redirect_uri',  // Redirect URI for OAuth callback
-	// 	// ],
+// 	// Google OAuth Credentials
+// 	// 'google_oauth' => [
+// 	//     'client_id'     => 'your_client_id',     // Google API client ID
+// 	//     'client_secret' => 'your_client_secret', // Google API client secret
+// 	//     'redirect_uri'  => 'your_redirect_uri',  // Redirect URI for OAuth callback
+// 	// ],
 
-	// 	// Add more configuration sections below as needed
-	// ];
+// 	// Add more configuration sections below as needed
+// ];
 ];

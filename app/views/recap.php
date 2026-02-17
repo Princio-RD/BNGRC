@@ -1,83 +1,77 @@
-<?php
-$pageTitle = 'APK GNBRC - Récapitulatif';
-include __DIR__ . '/partials/header.php';
-?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récapitulation Financière</title>
+    <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
 
-<main class="panel-center">
-    <h2>Récapitulatif</h2>
+<?php include __DIR__ . '/partials/header.php'; ?>
 
-    <div class="dashboard-stats">
-        <div class="stat-card">
-            <h3 id="total-besoins"><?= number_format($summary['total_besoins'] ?? 0, 2) ?></h3>
-            <p>Total besoins (Ar)</p>
-        </div>
-        <div class="stat-card">
-            <h3 id="total-achete"><?= number_format($summary['total_achete'] ?? 0, 2) ?></h3>
-            <p>Besoins satisfaits (Ar)</p>
-        </div>
-        <div class="stat-card">
-            <h3 id="total-restant"><?= number_format($summary['total_restant'] ?? 0, 2) ?></h3>
-            <p>Besoins restants (Ar)</p>
-        </div>
-        <div class="stat-card">
-            <h3 id="total-dons"><?= number_format($total_dons ?? 0, 2) ?></h3>
-            <p>Dons totaux (Ar)</p>
-        </div>
-        <div class="stat-card">
-            <h3 id="dons-utilises"><?= number_format($dons_utilises ?? 0, 2) ?></h3>
-            <p>Dons utilisés (Ar)</p>
-        </div>
-        <div class="stat-card">
-            <h3 id="dons-restants"><?= number_format($dons_restants ?? 0, 2) ?></h3>
-            <p>Dons restants (Ar)</p>
-        </div>
-    </div>
+<div class="content">
+    <aside class="panel-gauche">
+        <ul class="menu">
+            <li class="menu-item"><a href="/">Tableau de bord</a></li>
+            <li class="menu-item"><a href="/besoin">Besoin</a></li>
+            <li class="menu-item"><a href="/dons">Dons disponible</a></li>
+            <li class="menu-item"><a href="/ville">Ville</a></li>
+            <li class="menu-item"><a href="/achats">Achats</a></li>
+            <li class="menu-item"><a href="/simulation">Simulation</a></li>
+            <li class="menu-item active"><a href="/recap">Récapitulation</a></li>
+        </ul>
+    </aside>
+    <main class="panel-center">
+        <h2>Récapitulation des Besoins (Montants)</h2>
 
-    <div class="form-card" style="margin-top:20px;">
-        <button id="btn-refresh" class="btn btn-edit">Actualiser</button>
-        <span id="refresh-status" class="hint"></span>
-    </div>
+        <div class="controls">
+            <span class="loader" id="loader"></span>
+            <button id="btn-refresh" class="btn btn-primary">Actualiser les données</button>
+        </div>
 
-    <table class="table" id="recap-table">
-        <thead>
-            <tr>
-                <th>Ville</th>
-                <th>Besoin</th>
-                <th>Type</th>
-                <th>Montant total</th>
-                <th>Montant acheté</th>
-                <th>Montant restant</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($details)): ?>
-                <?php foreach ($details as $d): ?>
-                    <?php $status = ((float) $d['montant_restant'] <= 0) ? 'Satisfait' : 'Restant'; ?>
-                    <tr>
-                        <td><?= htmlspecialchars($d['nom_ville']) ?></td>
-                        <td><?= htmlspecialchars($d['nom_produit']) ?></td>
-                        <td><?= htmlspecialchars($d['nom_type_besoin']) ?></td>
-                        <td><?= number_format($d['montant_total'], 2) ?> Ar</td>
-                        <td><?= number_format($d['montant_achete'], 2) ?> Ar</td>
-                        <td><?= number_format($d['montant_restant'], 2) ?> Ar</td>
-                        <td><?= $status ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="7">Aucun besoin enregistré.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</main>
+        <div class="recap-cards">
+            <div class="card bg-blue">
+                <h3 id="total-needs">0 Ar</h3>
+                <p>Besoins Totaux</p>
+            </div>
+            <div class="card bg-green">
+                <h3 id="satisfied-needs">0 Ar</h3>
+                <p>Besoins Satisfaits</p>
+            </div>
+            <div class="card bg-orange">
+                <h3 id="remaining-needs">0 Ar</h3>
+                <p>Besoins Restants</p>
+            </div>
+        </div>
+    </main>
 </div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
 
-<script src="/assets/js/recap_refresh.js"></script>
+<script>
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA', maximumFractionDigits: 2 }).format(amount).replace('MGA', 'Ar');
+    }
+
+    function loadData() {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'inline-block';
+        
+        fetch('/recap/data')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-needs').textContent = formatMoney(data.total);
+                document.getElementById('satisfied-needs').textContent = formatMoney(data.satisfait);
+                document.getElementById('remaining-needs').textContent = formatMoney(data.restant);
+                loader.style.display = 'none';
+            })
+            .catch(err => { console.error(err); loader.style.display = 'none'; });
+    }
+
+    document.getElementById('btn-refresh').addEventListener('click', loadData);
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
 
 </body>
-
 </html>

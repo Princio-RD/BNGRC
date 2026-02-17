@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace app\middlewares;
@@ -15,22 +14,18 @@ class SecurityHeadersMiddleware
 	{
 		$this->app = $app;
 	}
-
+	
 	public function before(array $params): void
 	{
 		$nonce = $this->app->get('csp_nonce');
 
-		// development mode to execute Tracy debug bar CSS
+		
 		$tracyCssBypass = "'nonce-{$nonce}'";
-		if (Debugger::$showBar === true) {
+		if(Debugger::$showBar === true) {
 			$tracyCssBypass = ' \'unsafe-inline\'';
 		}
 
-		$csp = "default-src 'self'; "
-			. "script-src 'self' 'nonce-{$nonce}'; "
-			. "style-src 'self' {$tracyCssBypass} https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
-			. "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-			. "img-src 'self' data:;";
+		$csp = "default-src 'self'; script-src 'self' 'nonce-{$nonce}' 'strict-dynamic'; style-src 'self' {$tracyCssBypass}; img-src 'self' data:;";
 		$this->app->response()->header('X-Frame-Options', 'SAMEORIGIN');
 		$this->app->response()->header("Content-Security-Policy", $csp);
 		$this->app->response()->header('X-XSS-Protection', '1; mode=block');

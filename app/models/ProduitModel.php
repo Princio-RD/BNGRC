@@ -7,9 +7,7 @@ use PDO;
 
 class ProduitModel
 {
-    /**
-     * Récupérer tous les produits avec leur type de besoin
-     */
+   
     public static function getAll(): array
     {
         $stmt = Flight::db()->query(
@@ -21,9 +19,7 @@ class ProduitModel
         return $stmt->fetchAll();
     }
 
-    /**
-     * Récupérer un produit par son ID
-     */
+   
     public static function getById(int $id): array|false
     {
         $stmt = Flight::db()->prepare(
