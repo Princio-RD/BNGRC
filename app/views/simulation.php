@@ -39,8 +39,23 @@
                 </form>
 
           <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+          
+          <h4 style="margin-bottom: 10px;">Réinitialisation</h4>
+          
+          
+          <form action="/simulation/reset" method="post" style="margin-bottom: 10px;">
+            <input type="hidden" name="type_reset" value="light">
+            <button type="submit" class="btn" style="background-color: #ffc107; color: #333; width: 100%;" onclick="return confirm('Cela va supprimer les distributions et achats uniquement. Continuer ?');">
+              Réinitialiser Distributions/Achats
+            </button>
+          </form>
+          
+
           <form action="/simulation/reset" method="post">
-            <button type="submit" class="btn" style="background-color: #dc3545;" onclick="return confirm('Attention : Cela va supprimer TOUTES les distributions et achats enregistrés et remettre les IDs à 1. Continuer ?');">Réinitialiser les données (Reset ID)</button>
+            <input type="hidden" name="type_reset" value="full">
+            <button type="submit" class="btn" style="background-color: #dc3545; width: 100%;" onclick="return confirm('ATTENTION : Cela va supprimer TOUTES les données et les remettre à leur état initial (données de démo). Continuer ?');">
+              Réinitialisation Complète (données initiales)
+            </button>
           </form>
             </div>
 

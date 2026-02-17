@@ -440,13 +440,74 @@ class HomeController
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+        
+        $type_reset = Flight::request()->data->type_reset ?? 'light';
+        
         try {
             Flight::db()->query("SET FOREIGN_KEY_CHECKS = 0");
-            Flight::db()->query("TRUNCATE TABLE distribution");
-            Flight::db()->query("TRUNCATE TABLE achat");
+            
+            if ($type_reset === 'full') {
+                // Réinitialisation complète : vider toutes les tables
+                Flight::db()->query("TRUNCATE TABLE distribution");
+                Flight::db()->query("TRUNCATE TABLE achat");
+                Flight::db()->query("TRUNCATE TABLE don_argent");
+                Flight::db()->query("TRUNCATE TABLE don");
+                Flight::db()->query("TRUNCATE TABLE besoin");
+                Flight::db()->query("TRUNCATE TABLE ville");
+                Flight::db()->query("TRUNCATE TABLE produit");
+                Flight::db()->query("TRUNCATE TABLE type_besoin");
+                Flight::db()->query("TRUNCATE TABLE region");
+                Flight::db()->query("TRUNCATE TABLE configuration");
+                
+                // Réinsérer les données initiales
+                // Régions
+                Flight::db()->query("INSERT INTO region (nom_region) VALUES ('Vakinankaratra'), ('Analamanga'), ('Atsinanana')");
+                
+                // Villes
+                Flight::db()->query("INSERT INTO ville (nom_ville, id_region, nombre_sinistres) VALUES 
+                    ('Antsirabe', 1, 500),
+                    ('Antananarivo', 2, 1200),
+                    ('Toamasina', 3, 800)");
+                
+                // Types de besoin
+                Flight::db()->query("INSERT INTO type_besoin (nom_type_besoin) VALUES ('Alimentaire'), ('Vestimentaire'), ('Médical')");
+                
+                // Produits
+                Flight::db()->query("INSERT INTO produit (nom_produit, id_type_besoin, prix_unitaire) VALUES 
+                    ('Riz', 1, 2500.00),
+                    ('T-shirt', 2, 15000.00),
+                    ('Paracétamol', 3, 1000.00)");
+                
+                // Besoins
+                Flight::db()->query("INSERT INTO besoin (id_ville, id_produit, quantite, date_besoin) VALUES 
+                    (1, 1, 100, '2026-02-16 10:00:00'),
+                    (2, 2, 50, '2026-02-17 11:00:00'),
+                    (3, 3, 200, '2026-02-18 12:00:00')");
+                
+                // Dons en nature
+                Flight::db()->query("INSERT INTO don (id_produit, quantite, date_don) VALUES 
+                    (1, 50, '2026-02-16 14:00:00'),
+                    (2, 25, '2026-02-17 15:00:00'),
+                    (3, 100, '2026-02-18 16:00:00'),
+                    (1, 100, '2026-02-19 08:00:00')");
+                
+                // Don en argent
+                Flight::db()->query("INSERT INTO don_argent (montant, date_don) VALUES (500000, '2026-02-20 10:00:00')");
+                
+                // Configuration
+                Flight::db()->query("INSERT INTO configuration (cle, valeur) VALUES ('frais_achat_pourcentage', '10') ON DUPLICATE KEY UPDATE valeur = '10'");
+                
+                $_SESSION['flash_message'] = ['type' => 'success', 'text' => 'Réinitialisation complète effectuée. Toutes les données ont été remises à leur état initial.'];
+            } else {
+                // Réinitialisation légère : seulement distributions et achats
+                Flight::db()->query("TRUNCATE TABLE distribution");
+                Flight::db()->query("TRUNCATE TABLE achat");
+                $_SESSION['flash_message'] = ['type' => 'success', 'text' => 'Les distributions et achats ont été supprimés. Les IDs recommenceront à 1.'];
+            }
+            
             Flight::db()->query("SET FOREIGN_KEY_CHECKS = 1");
-            $_SESSION['flash_message'] = ['type' => 'success', 'text' => 'Les distributions et achats ont été supprimés. Les IDs recommenceront à 1.'];
         } catch (\Exception $e) {
+            Flight::db()->query("SET FOREIGN_KEY_CHECKS = 1");
             $_SESSION['flash_message'] = ['type' => 'error', 'text' => 'Erreur lors de la réinitialisation : ' . $e->getMessage()];
         }
         Flight::redirect('/simulation');
