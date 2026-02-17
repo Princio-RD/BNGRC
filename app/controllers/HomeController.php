@@ -247,7 +247,7 @@ class HomeController
         $simulation_summary = $_SESSION['simulation_summary'] ?? null;
         $flash_message = $_SESSION['flash_message'] ?? null;
 
-        // On nettoie la session pour ne pas afficher les données plusieurs fois
+        
         unset($_SESSION['simulation_plan'], $_SESSION['simulation_summary'], $_SESSION['flash_message']);
 
         Flight::render('simulation', [
@@ -267,7 +267,7 @@ class HomeController
         $allocations = [];
         $restes = [];
 
-        // 1. Calculer les parts idéales, les allocations de base et les restes
+       
         foreach ($besoins as $id => $quantite_besoin) {
             $part_ideale = ($quantite_besoin / $total_besoins) * $total_a_distribuer;
             $allocations[$id] = floor($part_ideale);
