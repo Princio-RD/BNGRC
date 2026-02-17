@@ -79,4 +79,5 @@ Flight::route('GET /recap', [HomeController::class, 'recapPage']);
 Flight::route('GET /recap/data', [HomeController::class, 'recapData']);
 
 
-Flight::start();
+// L'application est démarrée depuis bootstrap.php via $app->start();
+// Ne pas appeler Flight::start() ici pour éviter le traitement double des routes
